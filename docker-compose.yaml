@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  api:
+    build: ./
+    expose:
+      - "8080"
+    networks:
+      - proxy
+
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    networks:
+      - proxy
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: toor
+      POSTGRES_DB: rinha_db
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    volumes:
+      - "./data:/var/lib/postgresql/data"
+
+networks:
+  proxy:
+    driver: bridge
+  db:
+    driver: bridge
